@@ -7,11 +7,43 @@ const Result = () => {
         <p className="success-message">Your Message has been successfully sent. I will contact you soon.</p>
     )
 }
-function ContactForm({ props }) {
+function ContactForm({ targetValue }) {
     const [result, showresult] = useState(false);
+    const [InterestedArea, setInterestedArea] = useState("");
+    const [FormData, setFormData] = useState({
+        fname: "",
+        lname: "",
+        email: "",
+        phone: "",
+        company: "",
+        jobtitle: "",
+        message: ""
+    });
 
-    const sendEmail = (e) => {
+    const handleInputChnage = (e) => {
+        if (e && e.target) {
+            const { name, value } = e.target;
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        }
+    };
+
+    const sendEmail = async (e) => {
         e.preventDefault();
+
+        const postData = {
+            interested_area: InterestedArea.value,
+            fname: FormData.fname,
+            lname: FormData.lname,
+            email: FormData.email,
+            phone: FormData.phone,
+            company: FormData.company,
+            jobtitle: FormData.jobtitle,
+            message: FormData.message
+        };
+
         emailjs
             .sendForm(
                 'service_p4x3hv8',
@@ -26,6 +58,25 @@ function ContactForm({ props }) {
                     console.log(error.text);
                 }
             );
+
+        // // Send a POST request using fetch
+        await fetch(`http://localhost:5000/api/${targetValue}/register-${targetValue}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                // Handle the success response
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                // Handle errors
+                console.error('Error:', error);
+            });
+
         e.target.reset();
         showresult(true);
     };
@@ -38,36 +89,40 @@ function ContactForm({ props }) {
     const options = [
         { value: 'technical', label: 'Technical' },
         { value: 'marketing', label: 'Marketing' },
-        { value: 'construction', label: 'Construction'},
+        { value: 'construction', label: 'Construction' },
         { value: 'programming', label: 'Programming' }
     ]
 
 
     return (
         <form action="https://getform.io/f/997545f2-b658-4097-bfe4-07083390621a" method='POST' onSubmit={sendEmail}>
-
             <div className="rn-form-group">
                 <Select
-               
-                    name="select"
+                    defaultValue={InterestedArea}
+                    onChange={setInterestedArea}
+                    name="interested_area"
                     placeholder="Tell us what you're interested in"
                     options={options} />
             </div>
-            <br/>
+            <br />
             <div className="rn-form-group">
                 <input
                     type="text"
                     name="fname"
+                    value={FormData.fname}
                     placeholder="Enter your first name"
                     required
+                    onChange={handleInputChnage}
                 />
             </div>
             <div className="rn-form-group">
                 <input
                     type="text"
                     name="lname"
+                    value={FormData.lname}
                     placeholder="Enter your lastname"
                     required
+                    onChange={handleInputChnage}
                 />
             </div>
 
@@ -75,8 +130,10 @@ function ContactForm({ props }) {
                 <input
                     type="email"
                     name="email"
+                    value={FormData.email}
                     placeholder="Enter your email address"
                     required
+                    onChange={handleInputChnage}
                 />
             </div>
 
@@ -84,35 +141,43 @@ function ContactForm({ props }) {
                 <input
                     type="text"
                     name="phone"
+                    value={FormData.phone}
                     placeholder="Phone number with country code"
                     required
+                    onChange={handleInputChnage}
                 />
             </div>
 
-           
+
 
             <div className="rn-form-group">
                 <input
                     type="text"
                     name="company"
+                    value={FormData.company}
                     placeholder="Enter your company"
                     required
+                    onChange={handleInputChnage}
                 />
             </div>
             <div className="rn-form-group">
                 <input
                     type="text"
                     name="jobtitle"
+                    value={FormData.jobtitle}
                     placeholder="Enter your title"
                     required
+                    onChange={handleInputChnage}
                 />
             </div>
 
             <div className="rn-form-group">
                 <textarea
                     name="message"
+                    value={FormData.message}
                     placeholder="Enter your message"
                     required
+                    onChange={handleInputChnage}
                 >
                 </textarea>
             </div>
